@@ -5,6 +5,7 @@ class Tiles {
     this.piece = piece || "";
     this.hasValidMove = false; //hasValidMove
     this.isSelected = false;
+    this.pieceThreatList = [];
     //not in use
     this.coordinates = {
       r: 0,

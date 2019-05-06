@@ -14,22 +14,47 @@ class Board {
     this.player2 = new Players(2);
     this.activePlayer = this.player1;
 
-    this.board = Config.boards.threepawn;
+    this.board = Config.boards.default;
+    console.log(Config.boards);
+this.pieces = [];
+    this.board.filter( (row) => {
+      row.filter( (tile) => {
+        if(tile.hasPiece())
+        this.pieces.push(tile);
+        
+      })
+      
+     
+      
+    })
+    this.loadBoard('default');
 
-    this.renderBoard();
     this.events();
+
+    console.log(this.pieces);
+    this.activeTile = this.pieces[3]
+      this.setPossibleMoves();
+    // for(let piece of this.pieces){
+      
+    //   this.activeTile = piece
+    //   this.setPossibleMoves();
+      
+    // }
   }
 
-
+  loadBoard(board) {
+    this.board = Config.boards[board];
+    this.renderBoard();
+  }
   /**
    * Render board on html
    */
   renderBoard() {
-    let bgcolor = "";
-    this.$el.innerHTML = ""
+
     for (let r = 0; r < this.board.length; r++) {
       for (var c = 0; c < this.board.length; c++) {
         let tile = this.board[r][c];
+        let bgcolor = "";
         //row is even
         if (r % 2 == 0) {
           bgcolor = ((c % 2 == 0 ? Config.board.color.even : Config.board.color.odd));
@@ -109,8 +134,6 @@ class Board {
     const moves = this.activeTile.piece.moves;
     let activeTile = this.activeTile;
 
-
-
     //se tiver ataque diferente
     if (this.activeTile.piece.attack) {
 
@@ -141,12 +164,13 @@ class Board {
         }
 
       }
-    } /*else {
-      let tile = this.board[Ar][Ac];
+    }
+    /*else {
+         let tile = this.board[Ar][Ac];
 
-      this.updateActiveTileList(tile);
+         this.updateActiveTileList(tile);
 
-    }*/
+       }*/
 
 
     for (var i = 0; i < moves.list.length; i++) {
@@ -163,30 +187,29 @@ class Board {
         //se nao alastra o movimento
         if (!moves.spread) {
 
-          if(!this.board[_r][_c].hasPiece()){
+          if (!this.board[_r][_c].hasPiece()) {
             let tile = this.board[_r][_c];
             this.updateActiveTileList(tile);
             continue;
           }
 
           if (this.board[_r][_c].hasPiece() && this.board[_r][_c].piece.player != this.activePlayer.color) {
-            if(this.activeTile.piece.attack) break;
+            if (this.activeTile.piece.attack) break;
             let tile = this.board[_r][_c];
             this.updateActiveTileList(tile);
             continue;
           }
-        }
-        else {
+        } else {
 
 
 
           // incrementa os tiles possiveis ate encontrar uma peça inimiga e enquanto houver tiles vazios;
-          while (this.isInBounds(_c, _r) && (this.board[_r][_c].piece.player != this.activePlayer.color || !this.board[_r][_c].hasPiece())) {
+          while (this.isInBounds(_c, _r) && (this.board[_r][_c].piece.player != activeTile.piece.player || !this.board[_r][_c].hasPiece())) {
             let tile = this.board[_r][_c];
 
 
             //se a peça foi inimiga acrescenta um possible move ao tile onde esta situado a peça inimiga
-            if (this.isInBounds(_c, _r) && this.board[_r][_c].piece.player != this.activePlayer.color && this.board[_r][_c].hasPiece()) {
+            if (this.isInBounds(_c, _r) && this.board[_r][_c].piece.player != activeTile.piece.player && this.board[_r][_c].hasPiece()) {
               this.updateActiveTileList(tile);
               break;
             }
@@ -241,11 +264,9 @@ class Board {
       }
     }
   }
+
   events() {
-
-
     document.addEventListener("onTileClick", (e) => {
-      console.log(this);
       this.onTileClick(e.detail.tile);
     });
   }
